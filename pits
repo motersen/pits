@@ -1,0 +1,131 @@
+#!/usr/bin/picolisp /usr/lib/picolisp/lib.l
+
+(load "@lib/db.l" "@lib/btree.l")
+
+(class +Tag +Entity)
+(rel name (+Need +Key +String))
+(rel files (+Need +List +Link) path (+File))
+
+(class +File +Entity)
+(rel path (+Need +Key +String))
+(rel tags (+Need +List +Link) name (+Tag))
+
+(de request-tag (Tagname)
+	(request '(+Tag) 'name Tagname))
+
+(de request-file (Path)
+	(if (file-exists? Path)
+		(request '(+File) 'path (relative-path Path))
+		NIL))
+
+(de find-tag (Tagname)
+	(db 'name '(+Tag) Tagname))
+
+(de find-file (Path)
+	(db 'path '(+File) Path))
+
+(de file-exists? (Path)
+	(call "test" "-f" Path))
+
+(de relative-path (P)
+	(in (list 'realpath '--relative-to (pwd) P)
+		(line T)))
+
+(de tag-file (Path Tagname)
+	(cond
+		((request-file Path)
+		 (put> (request-tag Tagname) 'files @)
+		 (put> @ 'tags (request-tag Tagname))
+		 (commit 'upd))
+		(T
+		(msg "Pit: Error - File not found: " Path)
+		NIL)))
+
+(de del-file-from-tag (Tag File)
+	(del> Tag 'files File)
+	(when (not (pair (get Tag 'files)))
+		(lose!> Tag)
+		(zap Tag))
+	(commit 'upd))
+
+(de del-tag-from-file (File Tag)
+		(del> File 'tags Tag)
+		(when (not (pair (get File 'tags)))
+			(lose!> File)
+			(zap File))
+		(commit 'upd))
+
+(de untag-file (File Tag)
+	(del-tag-from-file File Tag)
+	(del-file-from-tag Tag File)
+	(commit 'upd))
+
+(de list-file-tags (Path)
+	(if (find-file Path)
+		(get @ 'tags)))
+
+(de list-tag-files (Tagname)
+	(if (find-tag Tagname)
+		(get @ 'files)))
+
+(de rm-tag (Tagname)
+	(if (find-tag Tagname)
+		(mapc '((F) (untag-file F @)) (get @ 'files))))
+
+(de rm-file (Path)
+	(if (find-file Path)
+		(mapc '((Tag) (untag-file @ Tag)) (get @ 'tags))))
+
+## Main User Interaction Procedures
+
+(de list-files (Tagname)
+	(if (list-tag-files Tagname)
+		(mapc '((F) (prinl (get F 'path))) @)))
+
+(de list-tags (Path)
+	(if (list-file-tags Path)
+		(mapc '((T) (prinl (get T 'name))) @)))
+
+# expects type of objects and one or more objects to remove
+(de rm @
+	(case (next)
+		(("tag" "tags")
+		 (mapc rm-tag (rest)))
+		(("file" "files")
+		 (mapc rm-file (rest)))))
+
+(de all-tags ()
+	(mapc
+		'((Tag)
+			(prinl (pack (get Tag 'name) "^I" (length (get Tag 'files)))))
+		(collect 'name '+Tag)))
+
+(de all-files ()
+	(mapc
+		'((File)
+			(prinl (pack (get File 'path) "^I" (length (get File 'tags)))))
+		(collect 'path '+File)))
+
+# expects tagstring as first and paths as following arguments
+(de tag @
+	(let (Tag (next))
+		(mapc '((F) (tag-file F Tag)) (rest))))
+
+(pool ".pitsdb")
+(dbck)
+
+(case (opt)
+	(("at" "all-tags")
+	 (all-tags))
+	(("af" "all-files")
+	 (all-files))
+	(("lf" "list-files")
+	 (list-files (opt)))
+	(("lt" "list-tags")
+	 (list-tags (opt)))
+	(("rm" "remove")
+	 (apply rm (argv)))
+	("tag"
+	 (apply tag (argv))))
+
+(bye)
