@@ -111,6 +111,11 @@
 	(let (File (next))
 		(mapc '((Tag) (tag-file File Tag)) (rest))))
 
+# reverse interpretation of tag
+(de tag-files @
+	(let (Tag (next))
+		(mapc '((F) (tag-file F Tag)) (rest))))
+
 (pool ".pitsdb")
 (dbck)
 
@@ -126,6 +131,8 @@
 	(("rm" "remove")
 	 (apply rm (argv)))
 	("tag"
-	 (apply tag (argv))))
+	 (apply tag (argv)))
+	(("tf" "tag-files")
+	 (apply tag-files (argv))))
 
 (bye)
