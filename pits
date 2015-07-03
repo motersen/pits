@@ -130,7 +130,7 @@
 	 (list-tags (opt)))
 	(("rm" "remove")
 	 (apply rm (argv)))
-	("tag"
+	(("t" "tag")
 	 (apply tag (argv)))
 	(("tf" "tag-files")
 	 (apply tag-files (argv))))
