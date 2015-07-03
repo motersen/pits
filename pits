@@ -106,10 +106,10 @@
 			(prinl (pack (get File 'path) "^I" (length (get File 'tags)))))
 		(collect 'path '+File)))
 
-# expects tagstring as first and paths as following arguments
+# expects a path as first and tagstrings as following arguments
 (de tag @
-	(let (Tag (next))
-		(mapc '((F) (tag-file F Tag)) (rest))))
+	(let (File (next))
+		(mapc '((Tag) (tag-file File Tag)) (rest))))
 
 (pool ".pitsdb")
 (dbck)
