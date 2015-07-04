@@ -97,13 +97,13 @@
 (de all-tags ()
 	(mapc
 		'((Tag)
-			(prinl (pack (get Tag 'name) "^I" (length (get Tag 'files)))))
+			(prinl (get Tag 'name)))
 		(collect 'name '+Tag)))
 
 (de all-files ()
 	(mapc
 		'((File)
-			(prinl (pack (get File 'path) "^I" (length (get File 'tags)))))
+			(prinl (get File 'path)))
 		(collect 'path '+File)))
 
 # expects a path as first and tagstrings as following arguments
