@@ -80,11 +80,11 @@
 
 (de list-files (Tagname)
 	(if (list-tag-files Tagname)
-		(mapc '((F) (prinl (get F 'path))) @)))
+		(mapc prinl (sort (mapcar '((F) (get F 'path)) @)))))
 
 (de list-tags (Path)
 	(if (list-file-tags Path)
-		(mapc '((T) (prinl (get T 'name))) @)))
+		(mapc prinl (sort (mapcar '((Tag) (get Tag 'name)) @)))))
 
 # expects type of objects and one or more objects to remove
 (de rm @
