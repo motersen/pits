@@ -106,6 +106,14 @@
 			(prinl (get File 'path)))
 		(collect 'path '+File)))
 
+(de garbage-collect ()
+	(mapc
+		'((F)
+			(let (P (get F 'path))
+				(if (not (file-exists? P))
+					(rm-file P))))
+		(collect 'path '+File)))
+
 # expects a path as first and tagstrings as following arguments
 (de tag @
 	(let (File (next))
@@ -124,6 +132,8 @@
 	 (all-tags))
 	(("af" "all-files")
 	 (all-files))
+	("gc"
+	 (garbage-collect))
 	(("lf" "list-files")
 	 (list-files (opt)))
 	(("lt" "list-tags")
