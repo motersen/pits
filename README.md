@@ -31,6 +31,8 @@ your `PATH`. Then you can run pits as follows:
 - pits **rm|remove** "file|files" &lt;file&gt;...
 - pits **t|tag** &lt;file&gt; &lt;tag&gt;...
 - pits **tf|tag-files** &lt;tag&gt; &lt;file&gt;...
+- pits **ut|untag** &lt;file&gt; &lt;tag&gt;...
+- pits **utf|untag-files** &lt;tag&gt; &lt;file&gt;...
 
 **af, all-files**
 
@@ -84,11 +86,22 @@ database. Tags are created if they don't exist yet.
 Adds &lt;tag&gt; to one or more files. Basically the same behaviour as
 **tag**, but reversed.
 
+---
+
+**ut, untag &lt;file&gt; &lt;tag&gt;...**
+
+Counterpart to **tag**. Removes one or more tags from &lt;file&gt;.
+
+**utf, untag-files &lt;tag&gt; &lt;file&gt;...**
+
+Counterpart to **tag-files**. Removes &lt;tag&gt; from one or more
+files.
+
 ### ...that's all  ?
 
 More functionality is coming - here's the list:
 
-- [ ] Removing tags from files (Don't know how I forgot about that)
+- [x] Removing tags from files
 - [ ] Narrowing the output of list-{files|tags} by combining the sets of
       tagged images using (and), (or), (not)...	
 - [ ] A mv command to rename a file in pits and the filesystem

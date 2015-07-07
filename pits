@@ -124,6 +124,24 @@
 	(let (Tag (next))
 		(mapc '((F) (tag-file F Tag)) (rest))))
 
+(de untag @
+	(let (F (find-file (next)))
+		(if F
+			(mapc
+				'((Tagname)
+					(if (find-tag Tagname)
+						(untag-file F @)))
+				(rest)))))
+
+(de untag-files @
+	(let (Tag (find-tag (next)))
+		(if Tag
+			(mapc
+				'((P)
+					(if (find-file P)
+						(untag-file @ Tag)))
+				(rest)))))
+
 (pool ".pitsdb")
 (dbck)
 
@@ -143,6 +161,10 @@
 	(("t" "tag")
 	 (apply tag (argv)))
 	(("tf" "tag-files")
-	 (apply tag-files (argv))))
+	 (apply tag-files (argv)))
+	(("ut" "untag")
+	 (apply untag (argv)))
+	(("utf" "untag-files")
+	 (apply untag-files (argv))))
 
 (bye)
